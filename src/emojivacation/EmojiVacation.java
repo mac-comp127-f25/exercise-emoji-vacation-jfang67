@@ -33,8 +33,14 @@ public class EmojiVacation {
 
     private static void doSlideShow(CanvasWindow canvas) {
         // TODO: [Instructions step 8] Change this to an actual slideshow
-        generateVacationPhoto(canvas);
+        while (true) {
+            generateVacationPhoto(canvas);
+            canvas.draw();               
+            canvas.pause(3.0);      
+            canvas.removeAll();      
+        }
     }
+    
 
     private static void generateVacationPhoto(CanvasWindow canvas) {
         canvas.setBackground(randomColorVariation(SKY_BLUE, 8));
@@ -42,12 +48,22 @@ public class EmojiVacation {
         addSun(canvas);
 
         addCloudRows(canvas);
+       if (percentChance(50)) {
+           double size  = randomDouble(100, 140);  
+           int layers   = randomInt(2, 3);        
+           addMountains(canvas, 380, size, layers);
+        }
+
 
         // TODO: [Instructions step 2] Create mountains 50% of the time.
         //       You should randomly determine the size and number of layers
         //       (within reasonable constraints).
 
         addGround(canvas, 400);
+        if (percentChance(60)) {
+            int count = randomInt(8, 14);        
+            addForest(canvas, 420, 120, count);
+        }
 
         // TODO: [Instructions step 2] Create forests 60% of the time. You should randomly
         //       determine the count for the number of trees. Pick reasonable values for
@@ -55,6 +71,9 @@ public class EmojiVacation {
 
         List<GraphicsGroup> family = createFamily(2, 3);
         positionFamily(family, 60, 550, 20);
+        for (GraphicsGroup emoji : family) {
+            canvas.add(emoji);
+        }
         // TODO: [Instructions step 4] Add each emoji in the list to the canvas
     }
 
@@ -62,6 +81,16 @@ public class EmojiVacation {
 
     private static List<GraphicsGroup> createFamily(int adultCount, int childCount) {
         double adultSize = 160, childSize = 90;
+        ArrayList<GraphicsGroup> family = new ArrayList<>();
+        for (int i = 0; i < adultCount; i++) {
+            family.add(createRandomEmoji(adultSize));
+        }
+        for (int i = 0; i < childCount; i++) {
+            family.add(createRandomEmoji(childSize));
+        }
+        return family;
+    }
+
 
         // TODO: [Instructions step 6] Change this so that instead of always creating one adult
         //       and one child, it instead creates a list containing adultCount adults,
@@ -70,12 +99,17 @@ public class EmojiVacation {
         // Hint: You can't use List.of() to do this, because you don't know the size of the
         // resulting list before the code actually runs. What can you use?
         //
-        return List.of(
-            createRandomEmoji(adultSize),
-            createRandomEmoji(childSize));
-    }
+    //     return List.of(
+    //         createRandomEmoji(adultSize),
+    //         createRandomEmoji(childSize));
+    // }
 
     private static GraphicsGroup createRandomEmoji(double size) {
+        int pick = randomInt(1, 5); 
+        if (pick == 1) return ProvidedEmojis.createSmileyFace(size);
+        if (pick == 2) return ProvidedEmojis.createFrownyFace(size);
+        if (pick == 3) return ProvidedEmojis.createWinkingFace(size);
+        if (pick == 4) return ProvidedEmojis.createContentedFace(size);
         // TODO: [Instructions step 7] Change this so that instead of always creating a smiley face,
         //       it randomly selects one of the many available emojis.
         //
@@ -92,6 +126,15 @@ public class EmojiVacation {
             double baselineY,
             double spacing
     ) {
+        double x = leftX;           
+        for (GraphicsGroup emoji : family) {
+            double yTop = baselineY - emoji.getHeight(); 
+            emoji.setPosition(x, yTop);  
+            double width = emoji.getWidth();
+            x = x + width;
+                                   
+        }
+    }
         // TODO: [Instructions step 5] Iterate over the emojis in the list,
         //       and position them all in a neat row
 
@@ -101,7 +144,7 @@ public class EmojiVacation {
         //
         // The bottom of each emoji should be baselineY. But setPosition() sets the _top_! How do you set the bottom to
         // a given position? (Hint: you can ask any graphics object for its height.)
-    }
+    
 
     // –––––– Scenery ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
